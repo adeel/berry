@@ -1,5 +1,6 @@
 berry is a minimal web framework written in Python.  it was inspired by
-Sinatra, which is much better.
+Sinatra, which is much better.  nevertheless, it is a real framework and i
+have used it in serious websites.
 
 EXAMPLE:
 
