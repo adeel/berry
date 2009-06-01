@@ -16,5 +16,7 @@ NOTES:
 
   - you can use berry.render for views (uses Jinja2)
   - you can use berry.redirect for redirects
+  - berry expects you to have a ./static directory for serving static files,
+    but it is not necessary
   - you can import cherrypy and use any of its features
   - feel free to improve
