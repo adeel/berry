@@ -1,0 +1,20 @@
+berry is a minimal web framework written in Python.  it was inspired by
+Sinatra, which is much better.
+
+EXAMPLE:
+
+  import berry
+  from berry import path
+  
+  def index():
+    return 'Hello, world!'
+  path('^/?$').GET = index
+  
+  berry.start()
+
+NOTES:
+
+  - you can use berry.render for views (uses Jinja2)
+  - you can use berry.redirect for redirects
+  - you can import cherrypy and use any of its features
+  - feel free to improve
