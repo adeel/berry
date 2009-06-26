@@ -1,23 +1,25 @@
-berry is a minimal web framework written in Python.  it was inspired by
-Sinatra, which is much better.  nevertheless, it is a real framework and i
-have used it in serious websites.
+Berry is a minimal web framework written in Python.  It was inspired by
+Sinatra, which is much better.  It has just been rewritten and is no longer
+based on CherryPy.
 
 EXAMPLE:
 
   import berry
-  from berry import path
-  
+  from berry import get, post
+
+  @get('^$')
   def index():
-    return 'Hello, world!'
-  path('^/?$').GET = index
+    return "HOME"
+
+  @get('^(\d+)/?$')
+  def test(id):
+    return str(id)
+  
+  @get('^google/?$')
+  def google():
+    raise berry.Redirect('http://google.com')
   
   berry.start()
 
-NOTES:
-
-  - you can use berry.render for views (uses Jinja2)
-  - you can use berry.redirect for redirects
-  - berry expects you to have a ./static directory for serving static files,
-    but it is not necessary
-  - you can import cherrypy and use any of its features
-  - feel free to improve
+NOTES.  You can use Jinja2, etc., for views and Beaker for sessions.  Static
+file serving hasn't been implemented yet.

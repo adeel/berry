@@ -1,128 +1,140 @@
-import os
+import sys
 import re
 import inspect
-import cherrypy
+import paste.httpserver
+import paste.request
 
-_url_prefix = ''
+def start(host='127.0.0.1', port=4567):
+  try:
+    serve(host, str(port))
+  except KeyboardInterrupt:
+    sys.exit()
 
-def start(root=None, port=4567, url_prefix='', env='development', 
-      sessions=True, dispatcher=None):
-  cherrypy.config.update({'server.socket_host': '127.0.0.1',
-              'server.socket_port': port})
-  
-  global _url_prefix
-  _url_prefix = url_prefix
-  
-  if env == 'development':
-    cherrypy.config.update({'log.screen': True,
-                'request.show_tracebacks': True})
-  elif env == 'production':
-    cherrypy.config.update({'request.show_tracebacks': False})
-  cherrypy.config.update({'server.environment': env})
+def serve(host, port):
+  paste.httpserver.serve(handle_request, host=host, port=port)
 
-  if sessions:
-    cherrypy.config.update({'tools.sessions.on': True,
-                'tools.sessions.timeout': 360})
+def handle_request(env, start_response):
+  request = Request(env, start_response)
+  route, params = dispatch(request)
+  if not route:
+    return ErrorHandler(request, NotFound).error()
   
-  app_config = {}
-  app_config['/'] = {}
-
-  static_root = os.path.dirname(os.path.abspath(__file__))
-  app_config['/'].update({'tools.staticdir.root': static_root})
-  app_config['/static'] = {'tools.staticdir.on': True,
-               'tools.staticdir.dir': 'static'}
+  urlparams = {}
+  argnames = inspect.getargspec(route.handler)[0]
+  for i, param in enumerate(params):
+    urlparams[argnames[i]] = params[i]
+  request.params.update(urlparams)
   
-  if not dispatcher:
-    dispatcher = BerryDispatcher()
-  app_config['/'].update({'request.dispatch': dispatcher})
-  
-  if not root:
-    class Root: pass
-    root = Root()
-  cherrypy.quickstart(root, config=app_config)
-
-# dispatching
-
-urls = []
-
-class BerryDispatcher():
-  
-  def __init__(self):
-    global urls
-    self.urls = urls
-  
-  def __call__(self, path_info):
-    request = cherrypy.request
-    resource, params = self.find_handler(path_info)
-    if resource:
-      # Set Allow header
-      avail = [m for m in dir(resource) if m.isupper()]
-      if "GET" in avail and "HEAD" not in avail:
-        avail.append("HEAD")
-      avail.sort()
-      cherrypy.response.headers['Allow'] = ", ".join(avail)
-    
-      # Find the subhandler
-      meth = request.method.upper()
-      func = getattr(resource, meth, None)
-      if func is None and meth == "HEAD":
-        func = getattr(resource, "GET", None)
-      if func:
-        request.handler = cherrypy.dispatch.LateParamPageHandler(func)
-        paramdict = {}
-        argnames = inspect.getargspec(func)[0]
-        for i, param in enumerate(params):
-          paramdict[argnames[i]] = params[i]
-        cherrypy.request.params.update(paramdict)
-      else:
-        request.handler = cherrypy.HTTPError(405)
+  try:
+    output = route.handler(**dict(request.params))
+  except Exception, exception:
+    if isinstance(exception, HTTPError):
+      return ErrorHandler(request, exception).error()
     else:
-      request.handler = cherrypy.NotFound()
+      return ErrorHandler(request, AppError).error()
+  
+  print '200: "%s"' % request.path
+  content_type = getattr(route.handler, 'content_type', 'text/html')
+  start_response('200 OK', [('Content-Type', content_type)])
+  
+  return output
 
-  def find_handler(self, path_info):
-    cherrypy.request.config = base = cherrypy.config.copy()
+class HTTPError(Exception):
+  pass
+
+class NotFound(HTTPError):
+  status = 404
+
+class AppError(HTTPError):
+  status = 500
+
+class Redirect(HTTPError):
+  status = 303
+  
+  def __init__(self, url):
+    self.url = url
+  
+
+class ErrorHandler(object):
+  
+  def __init__(self, request, exception):
+    self.request = request
+    self.exception = exception
+    self.status = getattr(self.exception, 'status', 404)
+    print '%s: %s' % (self.status, self.exception)
+  
+  def error(self):
+    name = 'error_' + str(self.status)
+    try:
+      handler = self.__getattribute__(name)
+    except:
+      handler = self.error_404
+    return handler()
+  
+  def error_404(self):
+    self.request.start_response('404 Not Found',
+      [('Content-type', 'text/plain')])
+    return 'Not Found'
+  
+  def error_500(self):
+    self.request.start_response('500 Internal Server Error',
+      [('Content-type', 'text/plain')])
+    return 'Internal Server Error'
+  
+  def error_303(self):
+    self.request.start_response('303 See Other',
+      [('Content-type', 'text/plain'), ('Location', self.exception.url)])
+    return ''
+  
+
+class Request(object):
+  
+  def __init__(self, env, start_response):
+    self.env = env
+    self.start_response = start_response
     
-    def merge(curpath):
-      nodeconf = cherrypy.request.app.config[curpath]
-      if 'tools.staticdir.dir' in nodeconf:
-        nodeconf['tools.staticdir.section'] = curpath or "/"
-      base.update(nodeconf)
-    
-    merge("/")
-    merge("/static")
-    
-    path_info = path_info.lstrip('/')
-    for route in self.urls:
-      match = re.search(route.path, path_info)
+    self.path = self.env.get('PATH_INFO', '').lstrip('/')
+    self.method = self.env.get('REQUEST_METHOD', 'GET').upper()
+    self.query = self.env.get('QUERY_STRING', '')
+    self.params = paste.request.parse_formvars(self.env)
+  
+
+def dispatch(request):
+  for route in routes:
+    if route.method == request.method:
+      match = re.search(route.path, request.path)
       if match is not None:
-        return route, match.groups()
-    return None, ()
+        return route, list(match.groups())
+  return None, []
 
+routes = []
 
-class path:
-  def __init__(self, path):
+def get(path):
+  
+  def register(handler):
+    route = Route(path, handler, 'GET')
+    if path not in [r.path for r in routes]:
+      routes.append(route)
+    return handler
+  return register
+
+def post(path):
+  
+  def register(handler):
+    route = Route(path, handler, 'POST')
+    if path not in [r.path for r in routes]:
+      routes.append(route)
+    return handler
+  return register
+
+class Route(object):
+  
+  def __init__(self, path, handler=None, method='GET'):
+    path = path.lstrip('/')
     self.path = path
-    global urls
-    if path not in [u.path for u in urls]:
-      urls.append(self)
-
-# useful functions
-
-def redirect(url):
-  if not url.startswith('http://'):
-    url = _url_prefix + url
-  raise cherrypy.HTTPRedirect(url)
-
-# views
-
-from jinja2 import Environment, FileSystemLoader
-
-views = Environment(loader=FileSystemLoader('views/'))
-
-def render(filename, data={}):
-  data['url_prefix'] = _url_prefix
-  data['is_logged_in'] = cherrypy.session.get('is_logged_in')
-  def htmlsafe(string):
-    return string.encode('ascii', 'xmlcharrefreplace')
-  data['htmlsafe'] = htmlsafe
-  return views.get_template(filename + '.jinja').render(data)
+    self.handler = handler
+    self.method = method.upper()
+  
+  def __repr__(self):
+    return "<Route: %s '%s' -> %s>" % (self.method, self.path, self.handler.__name__)
+  
