@@ -11,7 +11,28 @@
   <body>
     <div id="wrapper">
       <h1>berry</h1>
-      <p>a minimalist web framework</a>
+      <p>a minimalist web framework</p>
+      
+      <pre>
+        <code>
+import berry
+from berry import get, post
+
+@get('^$')
+def index():
+  return "HOME"
+
+@get('^(\d+)/?$')
+def test(id):
+  return str(id)
+
+@get('^google/?$')
+def google():
+  raise berry.Redirect('http://google.com')
+
+berry.start()
+        </code>
+      </pre>
     </div>
     <!-- <script type="text/javascript">
     var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");

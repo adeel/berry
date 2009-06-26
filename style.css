@@ -20,11 +20,8 @@ body {
       h1 a,
       h1 a:hover {
         text-decoration: none;
-/*        color: #800000;*/
       }
-      h1 a:hover {
-/*        color: #BB0000;*/
-      }
+      h1 a:hover {}
     p {
       font-size: 18px;
       line-height: 1.7em;
@@ -39,8 +36,3 @@ body {
         color: black;
         text-decoration: none;
       }
-  
-#work {}
-  #work a {
-    font-style: italic;
-  }
