@@ -4,17 +4,26 @@ import inspect
 import paste.httpserver
 import paste.request
 
+env = None
+middlewares = []
+
 def start(host='127.0.0.1', port=4567):
   try:
     serve(host, str(port))
   except KeyboardInterrupt:
     sys.exit()
 
-def serve(host, port):
-  paste.httpserver.serve(handle_request, host=host, port=port)
+def use(middleware, options=None):
+  middlewares.append((middleware, options))
 
-def handle_request(env, start_response):
-  request = Request(env, start_response)
+def serve(host, port):
+  app = handle_request
+  for middleware, options in middlewares:
+    app = middleware(app, options)
+  paste.httpserver.serve(app, host=host, port=port)
+
+def handle_request(_env, start_response):
+  request = Request(_env, start_response)
   route, params = dispatch(request)
   if not route:
     return ErrorHandler(request, NotFound).error()
@@ -24,6 +33,9 @@ def handle_request(env, start_response):
   for i, param in enumerate(params):
     urlparams[argnames[i]] = params[i]
   request.params.update(urlparams)
+  
+  global env
+  env = _env
   
   try:
     output = route.handler(**dict(request.params))
@@ -88,7 +100,6 @@ class ErrorHandler(object):
   
 
 class Request(object):
-  
   def __init__(self, env, start_response):
     self.env = env
     self.start_response = start_response
@@ -110,7 +121,6 @@ def dispatch(request):
 routes = []
 
 def get(path):
-  
   def register(handler):
     route = Route(path, handler, 'GET')
     if path not in [r.path for r in routes]:
@@ -119,7 +129,6 @@ def get(path):
   return register
 
 def post(path):
-  
   def register(handler):
     route = Route(path, handler, 'POST')
     if path not in [r.path for r in routes]:

@@ -2,7 +2,8 @@ Berry is a minimal web framework written in Python.  It was inspired by
 Sinatra, which is much better.  It has just been rewritten and is no longer
 based on CherryPy.
 
-EXAMPLE:
+Example
+--
 
   import berry
   from berry import get, post
@@ -21,5 +22,15 @@ EXAMPLE:
   
   berry.start()
 
-NOTES.  You can use Jinja2, etc., for views and Beaker for sessions.  Static
+Middleware
+--
+
+  berry.use(MyMiddleware, options_dict)
+
+The WSGI environ variable is available as berry.env.
+
+Notes
+--
+
+You can use Jinja2, etc., for views and Beaker for sessions.  Static
 file serving hasn't been implemented yet.
