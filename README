@@ -32,5 +32,5 @@ The WSGI environ variable is available as berry.env.
 Notes
 --
 
-You can use Jinja2, etc., for views and Beaker for sessions.  Static
-file serving hasn't been implemented yet.
+You can use something like Jinja, etc., for views and Beaker for sessions. Use
+nginx or Apache to serve static files.
