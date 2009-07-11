@@ -1,3 +1,24 @@
+"""
+Berry is a minimal web framework written in Python.
+
+import berry
+from berry import get, post
+
+@get('^$')
+def index():
+  return "HOME"
+
+@get('^(\d+)/?$')
+def test(id):
+  return str(id)
+
+@get('^google/?$')
+def google():
+  raise redirect('http://google.com')
+
+berry.start()
+"""
+
 import sys
 import re
 import inspect
@@ -8,21 +29,34 @@ env = None
 middlewares = []
 
 def start(host='127.0.0.1', port=4567):
+  "Start the application."
+  
   try:
-    serve(host, str(port))
+    serve(host, port)
   except KeyboardInterrupt:
     sys.exit()
 
 def use(middleware, options=None):
+  "Use a middleware.  (Can take options.)"
+  
   middlewares.append((middleware, options))
 
+def redirect(url):
+  "Wrapper for redirecting."
+  
+  raise Redirect(url)
+
 def serve(host, port):
+  "Run the application using the HTTP server in Paste."
+  
   app = handle_request
   for middleware, options in middlewares:
     app = middleware(app, options)
-  paste.httpserver.serve(app, host=host, port=port)
+  paste.httpserver.serve(app, host=host, port=str(port))
 
 def handle_request(_env, start_response):
+  "The WSGI application."
+  
   request = Request(_env, start_response)
   route, params = dispatch(request)
   if not route:
@@ -52,7 +86,7 @@ def handle_request(_env, start_response):
   return output
 
 class HTTPError(Exception):
-  pass
+  "Base class for HTTP errors."
 
 class NotFound(HTTPError):
   status = 404
@@ -68,6 +102,7 @@ class Redirect(HTTPError):
   
 
 class ErrorHandler(object):
+  "Handle HTTP errors."
   
   def __init__(self, request, exception):
     self.request = request
@@ -100,6 +135,8 @@ class ErrorHandler(object):
   
 
 class Request(object):
+  "Abstraction of the WSGI request."
+  
   def __init__(self, env, start_response):
     self.env = env
     self.start_response = start_response
@@ -111,6 +148,8 @@ class Request(object):
   
 
 def dispatch(request):
+  "Dispatch the request."
+  
   for route in routes:
     if route.method == request.method:
       match = re.search(route.path, request.path)
@@ -121,6 +160,8 @@ def dispatch(request):
 routes = []
 
 def get(path):
+  "The decorator for GET."
+  
   def register(handler):
     route = Route(path, handler, 'GET')
     if path not in [r.path for r in routes]:
@@ -129,6 +170,8 @@ def get(path):
   return register
 
 def post(path):
+  "The decorator for POST."
+  
   def register(handler):
     route = Route(path, handler, 'POST')
     if path not in [r.path for r in routes]:
@@ -137,6 +180,7 @@ def post(path):
   return register
 
 class Route(object):
+  "Abstraction of routes."
   
   def __init__(self, path, handler=None, method='GET'):
     path = path.lstrip('/')

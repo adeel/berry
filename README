@@ -18,7 +18,7 @@ Example
   
   @get('^google/?$')
   def google():
-    raise berry.Redirect('http://google.com')
+    redirect('http://google.com')
   
   berry.start()
 
