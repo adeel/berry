@@ -1,6 +1,6 @@
 Berry is a minimal web framework written in Python.  It was inspired by
-Sinatra, which is much better.  It has just been rewritten and is no longer
-based on CherryPy.
+Sinatra.  It is WSGI-compatible and makes use of the HTTP server in Python
+Paste.
 
 Example
 --
