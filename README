@@ -1,9 +1,10 @@
 Berry is a minimal web framework written in Python.  It was inspired by
-Sinatra.  It is WSGI-compatible and makes use of the HTTP server in Python
-Paste.
+Sinatra.  It is WSGI-compatible and makes use of the HTTP server in Paste.
 
-Example
---
+You can use something like Jinja, etc., for views and Beaker for sessions. Use
+nginx or Apache to serve static files.
+
+Example:
 
   import berry
   from berry import get, post
@@ -22,15 +23,18 @@ Example
   
   berry.start()
 
-Middleware
---
+Getting form parameters:
 
-  berry.use(MyMiddleware, options_dict)
+  Parameters passed through both GET and POST are stored in berry.params.
+  Parameters from routes are passed as arguments to the function.
 
-The WSGI environ variable is available as berry.env.
+Using middleware:
 
-Notes
---
+    berry.use(MyMiddleware, options_dict)
 
-You can use something like Jinja, etc., for views and Beaker for sessions. Use
-nginx or Apache to serve static files.
+  The WSGI environ variable is available as berry.env.
+
+Todo:
+
+  * Better error handling.
+  * Include session support natively because it's so common in web apps.

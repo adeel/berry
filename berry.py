@@ -58,27 +58,24 @@ def handle_request(_env, start_response):
   "The WSGI application."
   
   request = Request(_env, start_response)
-  route, params = dispatch(request)
+  route, _params = dispatch(request)
   if not route:
     return ErrorHandler(request, NotFound).error()
   
   # add params from route
   urlparams = {}
   argnames = inspect.getargspec(route.handler)[0]
-  for i, param in enumerate(params):
-    urlparams[argnames[i]] = params[i]
-  request.params.update(urlparams)
-  
-  # don't include params the function doesn't take
-  for key, val in request.params.items():
-    if key not in argnames:
-      del request.params[key]
+  for i, param in enumerate(_params):
+    urlparams[argnames[i]] = _params[i]
   
   global env
   env = _env
   
+  global params
+  params = request.params
+  output = route.handler(**dict(urlparams))
   try:
-    output = route.handler(**dict(request.params))
+    output = route.handler(**dict(urlparams))
   except Exception, exception:
     if isinstance(exception, HTTPError):
       return ErrorHandler(request, exception).error()
