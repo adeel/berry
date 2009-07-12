@@ -21,9 +21,9 @@ berry.start()
 
 import sys
 import re
+import cgi
 import inspect
 import paste.httpserver
-import paste.request
 
 env = None
 middlewares = []
@@ -62,11 +62,17 @@ def handle_request(_env, start_response):
   if not route:
     return ErrorHandler(request, NotFound).error()
   
+  # add params from route
   urlparams = {}
   argnames = inspect.getargspec(route.handler)[0]
   for i, param in enumerate(params):
     urlparams[argnames[i]] = params[i]
   request.params.update(urlparams)
+  
+  # don't include params the function doesn't take
+  for key, val in request.params.items():
+    if key not in argnames:
+      del request.params[key]
   
   global env
   env = _env
@@ -144,8 +150,47 @@ class Request(object):
     self.path = self.env.get('PATH_INFO', '').lstrip('/')
     self.method = self.env.get('REQUEST_METHOD', 'GET').upper()
     self.query = self.env.get('QUERY_STRING', '')
-    self.params = paste.request.parse_formvars(self.env)
+    self.params = self.parse_params()
   
+  def parse_params(self):
+    "Parse all form data."
+    
+    params = {}
+    params.update(self.parse_get_params())
+    params.update(self.parse_post_params())
+    return params
+  
+  def parse_get_params(self):
+    "Parse form data passed through GET."
+    
+    parsed = cgi.parse_qs(self.env['QUERY_STRING'], keep_blank_values=True)
+    params = {}
+    for key, val in parsed.items():
+      if len(val) == 0:
+        params[key] = ''
+      elif len(val) == 1:
+        params[key] = val[0]
+      else:
+        params[key] = val
+    return params
+  
+  def parse_post_params(self):
+    "Parse form data passed through POST."
+    
+    parsed = cgi.FieldStorage(fp=self.env['wsgi.input'], environ=self.env,
+                              keep_blank_values=True)
+    params = {}
+    for key in parsed:
+      val = parsed[key]
+      if any((isinstance(val, cgi.FieldStorage),
+              isinstance(val, cgi.MiniFieldStorage))):
+        params[key] = val.value
+      elif val.filename:
+        params[key] = val
+      else:
+        print val
+        params[key] = [f.value for f in val]
+    return params
 
 def dispatch(request):
   "Dispatch the request."
@@ -164,7 +209,7 @@ def get(path):
   
   def register(handler):
     route = Route(path, handler, 'GET')
-    if path not in [r.path for r in routes]:
+    if (path, 'GET') not in [(r.path, r.method) for r in routes]:
       routes.append(route)
     return handler
   return register
@@ -174,7 +219,7 @@ def post(path):
   
   def register(handler):
     route = Route(path, handler, 'POST')
-    if path not in [r.path for r in routes]:
+    if (path, 'POST') not in [(r.path, r.method) for r in routes]:
       routes.append(route)
     return handler
   return register
@@ -187,7 +232,4 @@ class Route(object):
     self.path = path
     self.handler = handler
     self.method = method.upper()
-  
-  def __repr__(self):
-    return "<Route: %s '%s' -> %s>" % (self.method, self.path, self.handler.__name__)
   
