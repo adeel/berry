@@ -7,7 +7,7 @@ nginx or Apache to serve static files.
 Example:
 
   import berry
-  from berry import get, post
+  from berry import get, redirect
 
   @get('^$')
   def index():

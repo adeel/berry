@@ -73,7 +73,7 @@ def handle_request(_env, start_response):
   
   global params
   params = request.params
-  output = route.handler(**dict(urlparams))
+  
   try:
     output = route.handler(**dict(urlparams))
   except Exception, exception:
@@ -83,6 +83,7 @@ def handle_request(_env, start_response):
       return ErrorHandler(request, AppError).error()
   
   print '200: "%s"' % request.path
+
   content_type = getattr(route.handler, 'content_type', 'text/html')
   start_response('200 OK', [('Content-Type', content_type)])
   
