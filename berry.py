@@ -116,17 +116,17 @@ class ErrorHandler(object):
     return handler()
   
   def error_404(self):
-    self.request.start_response('404 Not Found',
+    self.request._start_response('404 Not Found',
       [('Content-type', 'text/plain')])
     return 'Not Found'
   
   def error_500(self):
-    self.request.start_response('500 Internal Server Error',
+    self.request._start_response('500 Internal Server Error',
       [('Content-type', 'text/plain')])
     return 'Internal Server Error'
   
   def error_303(self):
-    self.request.start_response('303 See Other',
+    self.request._start_response('303 See Other',
       [('Content-type', 'text/plain'), ('Location', self.exception.url)])
     return ''
   
@@ -136,22 +136,22 @@ class Request(object):
   
   def __init__(self, env, start_response):
     self.env = env
-    self.start_response = start_response
+    self._start_response = start_response
     
     self.path = self.env.get('PATH_INFO', '').lstrip('/')
     self.method = self.env.get('REQUEST_METHOD', 'GET').upper()
     self.query = self.env.get('QUERY_STRING', '')
-    self.params = self.parse_params()
+    self.params = self._parse_params()
   
-  def parse_params(self):
+  def _parse_params(self):
     "Parse all form data."
     
     params = {}
-    params.update(self.parse_get_params())
-    params.update(self.parse_post_params())
+    params.update(self._parse_get_params())
+    params.update(self._parse_post_params())
     return params
   
-  def parse_get_params(self):
+  def _parse_get_params(self):
     "Parse form data passed through GET."
     
     parsed = cgi.parse_qs(self.env['QUERY_STRING'], keep_blank_values=True)
@@ -165,7 +165,7 @@ class Request(object):
         params[key] = val
     return params
   
-  def parse_post_params(self):
+  def _parse_post_params(self):
     "Parse form data passed through POST."
     
     parsed = cgi.FieldStorage(fp=self.env['wsgi.input'], environ=self.env,
@@ -182,6 +182,7 @@ class Request(object):
         print val
         params[key] = [f.value for f in val]
     return params
+  
 
 def dispatch(request):
   "Dispatch the request."
