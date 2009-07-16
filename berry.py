@@ -22,7 +22,6 @@ berry.start()
 import sys
 import re
 import cgi
-import inspect
 import paste.httpserver
 
 routes = []
@@ -62,14 +61,8 @@ def handle_request(env, start_response):
   if not route:
     return ErrorHandler(request, NotFound).error()
   
-  # add params from route
-  urlparams = {}
-  argnames = inspect.getargspec(route.handler)[0]
-  for i, param in enumerate(params):
-    urlparams[argnames[i]] = params[i]
-  
   try:
-    output = route.handler(request, **dict(urlparams))
+    output = route.handler(request, *params)
   except Exception, exception:
     if isinstance(exception, HTTPError):
       return ErrorHandler(request, exception).error()
