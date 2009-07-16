@@ -1,40 +1,128 @@
-Berry is a minimal web framework written in Python.  It was inspired by
-Sinatra.  It is WSGI-compatible and makes use of the HTTP server in Paste.
+Berry is a minimal web framework written in Python.
 
-You can use something like Jinja, etc., for views and Beaker for sessions. Use
-nginx or Apache to serve static files.
+Example
+-------
 
-Example:
+  Here is an instructive example.
 
   import berry
-  from berry import get, redirect
-
+  from berry import get
+  
   @get('^$')
   def index(req):
-    return "HOME"
-
-  @get('^(\d+)/?$')
-  def test(req, id):
-    return str(id)
+    return "<h1>Welcome to the home page.</h1>"
   
-  @get('^google/?$')
-  def google(req):
-    redirect('http://google.com')
+  @get('^hello/(.+)/?$')
+  def hello(req, name):
+    return "<h1>Hello, %s!</h1>"
   
   berry.start()
 
-Getting form parameters:
+How to use it
+-------------
 
-  Parameters passed through both GET and POST are stored in request.params.
-  Parameters from routes are passed as arguments to the function.
+  Decorate a function with berry.get(route) or berry.post(route) to serve
+  GET/POST requests that match a route.  Routes must be regular expressions.
+  Your function will be passed a Request object as the first argument.
+  
+  Example:
+  
+    @berry.get('^$')
+    @berry.get('^home$')
+    def home(req):
+      return 'This is the home page.'
+    
+  As above, you can map multiple routes to the same function.
+  
+  Request objects
+  ---------------
+    
+    Useful attributes of Request objects are:
+    
+      - env: the WSGI environ variable.
+      - params: parameters passed through both GET and POST.
+      - path: the path requested, minus the initial '/' and the query string
+      - query: the query string, if any
+      - fullpath: the full path requested, including the initial '/' and the
+        query string
+      - method: the method (GET or POST)
+    
+    Example:
+    
+      @berry.post('^login$')
+      def login(req):
+        username = berry.params['username']
+        password = berry.params['password']
+        # ...
+    
+  Handling errors
+  ---------------
+  
+    Using the berry.error(code) decorator, you can make custom error pages.
+    
+    Example:
+    
+      @berry.error(404)
+      def notfound(req):
+        return "%s was not found." % req.fullpath
+      
+    Berry has Redirect, Forbidden, NotFound, and AppError classes, which
+    are exceptions that inherit berry.HTTPError.  Just raise one of them:
+    
+      if not user.is_logged_in():
+        raise berry.Forbidden()
+    
+    To add an exception for a new HTTP status code you can do something like:
+    
+      class Unauthorized(berry.HTTPError):
+        status = (401, 'Unauthorized')
+        content = "<h1>401 Unauthorized</h1>"
+      
+    Application errors
+    ------------------
+    
+      If you set berry.debug = True, tracebacks will be outputted when there
+      is an exception in your code.  Otherwise they will only be written to
+      stderr.
+    
+    Redirecting
+    -----------
+    
+      To redirect, raise the berry.Redirect exception:
+      
+        raise berry.Redirect(url)
+      
+      For convenience it has been wrapped in a redirect function:
+      
+        redirect(url)
+      
+  Headers
+  -------
+  
+    To add HTTP headers, use the berry.header decorator:
+    
+      @berry.header('Content-Type', 'text/plain')
+      def download_as_txt(req, id):
+        # ...
+      
+    By default the Content-Type is set to 'text/html'.
+    
+  Using WSGI middleware
+  ---------------------
 
-Using middleware:
+    To use a WSGI middleware, use berry.use:
 
-    berry.use(MyMiddleware, options_dict)
+      berry.use(MyMiddleware, options_dict)
 
-  The WSGI environ variable is available as request.env.
+    The WSGI environ variable is available as the env attribute of the Request
+    object.
+  
+  
+  You can use something like Jinja, etc., for views and Beaker for sessions.
+  Use nginx to serve static files.
 
-Todo:
+Todo
+----
 
-  * Better error handling.
-  * Include session support natively because it's so common in web apps.
+  - Include session support natively because it's so common in web apps.
+  - Logging to custom files.
