@@ -25,7 +25,6 @@ import cgi
 import inspect
 import paste.httpserver
 
-env = None
 middlewares = []
 
 def start(host='127.0.0.1', port=4567):
@@ -54,28 +53,22 @@ def serve(host, port):
     app = middleware(app, options)
   paste.httpserver.serve(app, host=host, port=str(port))
 
-def handle_request(_env, start_response):
+def handle_request(env, start_response):
   "The WSGI application."
   
-  request = Request(_env, start_response)
-  route, _params = dispatch(request)
+  request = Request(env, start_response)
+  route, params = dispatch(request)
   if not route:
     return ErrorHandler(request, NotFound).error()
   
   # add params from route
   urlparams = {}
   argnames = inspect.getargspec(route.handler)[0]
-  for i, param in enumerate(_params):
-    urlparams[argnames[i]] = _params[i]
-  
-  global env
-  env = _env
-  
-  global params
-  params = request.params
+  for i, param in enumerate(params):
+    urlparams[argnames[i]] = params[i]
   
   try:
-    output = route.handler(**dict(urlparams))
+    output = route.handler(request, **dict(urlparams))
   except Exception, exception:
     if isinstance(exception, HTTPError):
       return ErrorHandler(request, exception).error()

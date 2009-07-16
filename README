@@ -10,29 +10,29 @@ Example:
   from berry import get, redirect
 
   @get('^$')
-  def index():
+  def index(req):
     return "HOME"
 
   @get('^(\d+)/?$')
-  def test(id):
+  def test(req, id):
     return str(id)
   
   @get('^google/?$')
-  def google():
+  def google(req):
     redirect('http://google.com')
   
   berry.start()
 
 Getting form parameters:
 
-  Parameters passed through both GET and POST are stored in berry.params.
+  Parameters passed through both GET and POST are stored in request.params.
   Parameters from routes are passed as arguments to the function.
 
 Using middleware:
 
     berry.use(MyMiddleware, options_dict)
 
-  The WSGI environ variable is available as berry.env.
+  The WSGI environ variable is available as request.env.
 
 Todo:
 
