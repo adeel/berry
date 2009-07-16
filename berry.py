@@ -10,7 +10,7 @@ def index(req):
 
 @get('^hello/(.+)/?$')
 def hello(req, name):
-  return "<h1>Hello, %s!</h1>"
+  return "<h1>Hello, %s!</h1>" % name
 
 berry.start()
 """
