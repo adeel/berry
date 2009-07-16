@@ -2,18 +2,18 @@
 Berry is a minimal web framework written in Python.
 
 import berry
-from berry import get, post
+from berry import get, redirect
 
 @get('^$')
-def index():
+def index(req):
   return "HOME"
 
 @get('^(\d+)/?$')
-def test(id):
+def test(req, id):
   return str(id)
 
 @get('^google/?$')
-def google():
+def google(req):
   raise redirect('http://google.com')
 
 berry.start()
