@@ -5,7 +5,7 @@ from setuptools import setup
 desc = open('README').read()
 
 setup(name='berry',
-      version='0.22',
+      version='0.5',
       description="a minimalist web framework",
       long_description=desc,
       url='http://adeel.github.com/berry',
@@ -13,7 +13,7 @@ setup(name='berry',
       author_email='adeel2@umbc.edu',
       py_modules=['berry'],
       include_package_data=True,
-      data_files=[('', ['README'])],
+      data_files=[('', ['README', 'LICENSE'])],
       install_requires=['Paste'],
       classifiers=[
         'Development Status :: 4 - Beta',

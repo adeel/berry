@@ -121,6 +121,31 @@ How to use it
   You can use something like Jinja, etc., for views and Beaker for sessions.
   Use nginx to serve static files.
 
+How to install
+--------------
+
+  Berry uses the HTTP server in Paste, so you need to have that installed.
+  
+  If you have setuptools just do:
+  
+    easy_install berry
+  
+  You can get the latest release from:
+  
+    http://pypi.python.org/pypi/berry
+  
+  Or get the latest development snapshot with git:
+  
+    git clone git://github.com/adeel/berry.git
+  
+  Then:
+  
+    python setup.py install
+  
+  Please report any issues to adeel2 at umbc dot edu.
+  
+  Thanks!
+
 Todo
 ----
 
