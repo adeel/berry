@@ -25,6 +25,7 @@ import cgi
 import inspect
 import paste.httpserver
 
+routes = []
 middlewares = []
 
 def start(host='127.0.0.1', port=4567):
@@ -193,8 +194,6 @@ def dispatch(request):
       if match is not None:
         return route, list(match.groups())
   return None, []
-
-routes = []
 
 def get(path):
   "The decorator for GET."
