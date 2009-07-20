@@ -212,7 +212,7 @@ class Request(object):
       if any((isinstance(val, cgi.FieldStorage),
               isinstance(val, cgi.MiniFieldStorage))):
         params[key] = val.value
-      elif val.filename:
+      elif hasattr(val, filename):
         params[key] = val
       else:
         print val
