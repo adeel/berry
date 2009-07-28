@@ -12,8 +12,6 @@ setup(name='berry',
       author='Adeel Ahmad Khan',
       author_email='adeel2@umbc.edu',
       py_modules=['berry'],
-      include_package_data=True,
-      data_files=[('', ['README', 'LICENSE'])],
       install_requires=['Paste'],
       classifiers=[
         'Development Status :: 4 - Beta',
