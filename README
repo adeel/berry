@@ -95,6 +95,12 @@ How to use it
       For convenience it has been wrapped in a redirect function:
       
         redirect(url)
+    
+    Logging
+    -------
+    
+      All requests are logged to stdout and to berry.logfile, which by
+      default is a temporary file with the prefix `berry-'.
       
   Headers
   -------
@@ -150,4 +156,3 @@ Todo
 ----
 
   - Include session support natively because it's so common in web apps.
-  - Logging to custom files.
