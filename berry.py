@@ -18,8 +18,10 @@ berry.start()
 import sys
 import re
 import cgi
-import logging
 import traceback
+import tempfile
+import logging
+import logging.handlers
 import paste.httpserver
 
 debug = False
@@ -28,20 +30,18 @@ routes = []
 middlewares = []
 error_handlers = {}
 
+logfile = tempfile.mkstemp(prefix='berry-')[1]
 logger = logging.getLogger('berry')
-logger.setLevel(logging.DEBUG)
-handler = logging.StreamHandler()
-handler.setFormatter(logging.Formatter('  [%(asctime)s] %(message)s'))
-logger.addHandler(handler)
 
 def start(host='127.0.0.1', port=4567):
   "Start the application."
+
+  _setup_logger()
   
   try:
     serve(host, port)
   except KeyboardInterrupt:
     sys.exit()
-  
 
 def use(middleware, options=None):
   "Use a middleware.  (Can take options.)"
@@ -277,3 +277,17 @@ def log(status, request):
     logger.exception(message)
   else:
     logger.error(message)
+
+def _setup_logger():
+  
+  logger.setLevel(logging.DEBUG)
+  formatter = logging.Formatter('  [%(asctime)s] %(message)s')
+  stdout_handler = logging.StreamHandler()
+  stdout_handler.setFormatter(formatter)
+  logger.addHandler(stdout_handler)
+  
+  if logfile:
+    fhandler = logging.handlers.RotatingFileHandler(logfile, maxBytes=2**20,
+      backupCount=5, encoding='utf-8')
+    fhandler.setFormatter(formatter)
+    logger.addHandler(fhandler)
