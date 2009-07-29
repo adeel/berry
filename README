@@ -155,5 +155,6 @@ How to install
 Todo
 ----
 
-  - Include session support natively because it's so common in web apps.
   - Just return a WSGI app and let the user take care of serving it.
+  - Write an actual `framework' that makes use of berry and provides an ORM,
+    views, etc.
