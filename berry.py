@@ -215,7 +215,6 @@ class Request(object):
       elif hasattr(val, 'filename'):
         params[key] = val
       else:
-        print val
         params[key] = [f.value for f in val]
     return params
   
