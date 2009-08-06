@@ -100,10 +100,6 @@ How to use it
       To redirect, raise the berry.Redirect exception:
       
         raise berry.Redirect(url)
-      
-      For convenience it has been wrapped in a redirect function:
-      
-        redirect(url)
     
     Logging
     -------
@@ -150,3 +146,11 @@ How to install
   
   If you try Berry, please write me at <adeel2@umbc.edu> and let me know what
   you think.
+
+Latest changes
+--------------
+
+  - Berry simply generates a WSGI app for you to serve yourself, instead of
+    serving it for you.
+  
+  - The convenience function redirect() was removed.
