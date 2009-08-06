@@ -3,8 +3,6 @@ Berry is a minimal web framework written in Python.
 Example
 -------
 
-  Here is an instructive example.
-
   import berry
   from berry import get
   
