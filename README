@@ -12,11 +12,11 @@ Example
   
   @get('^$')
   def index(req):
-    return "<h1>Welcome to the home page.</h1>"
+    return "Welcome to the home page."
   
   @get('^hello/(.+)/?$')
   def hello(req, name):
-    return "<h1>Hello, %s!</h1>" % name
+    return "Hello, %s!" % name
   
   berry.start()
 
@@ -153,10 +153,3 @@ How to install
   Please report any issues to adeel2 at umbc dot edu.
   
   Thanks!
-
-Todo
-----
-
-  - Just return a WSGI app and let the user take care of serving it.
-  - Write an actual `framework' that makes use of berry and provides an ORM,
-    views, etc.
