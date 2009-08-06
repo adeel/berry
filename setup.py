@@ -7,7 +7,7 @@ desc = open('README').read()
 setup(
   name='berry',
   version='0.1',
-  description="a minimalist web framework",
+  description="a minimal abstraction of WSGI",
   long_description=desc,
   url='http://soundofemptiness.com/projects/berry',
   author='Adeel Ahmad Khan',
