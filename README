@@ -127,13 +127,14 @@ How to use it
 How to install
 --------------
 
-  Berry uses the HTTP server in Paste, so you need to have that installed.
+  For now, Berry uses the HTTP server in Paste, so you need to have that
+  installed.
   
   If you have setuptools just do:
   
     easy_install berry
   
-  You can get the latest release from:
+  Otherwise, you can get the latest release from:
   
     http://pypi.python.org/pypi/berry
   
@@ -145,6 +146,5 @@ How to install
   
     python setup.py install
   
-  Please report any issues to adeel2 at umbc dot edu.
-  
-  Thanks!
+  If you try Berry, please write me at <adeel2@umbc.edu> and let me know what
+  you think.
