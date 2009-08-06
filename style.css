@@ -1,0 +1,61 @@
+html,
+body {
+  margin: 0;
+  padding: 0;
+  background-color: #EAEAEA;
+}
+  #wrapper {
+    width: 500px;
+    overflow: auto;
+    margin: 70px auto 20px;
+    padding: 10px;
+    background-color: white;
+    border: 1px solid #BABABA;
+    font-family: Georgia, serif;
+    text-shadow: 0 0 0 white;
+    font-size: 1.4em;
+  }
+  
+    h1 {
+      font-size: 100px;
+      font-weight: normal;
+      margin: 10px;
+      text-align: center;
+    }
+      h1 a,
+      h1 a:hover {
+        text-decoration: none;
+        color: #B01C16;
+      }
+      h1 a:hover {
+        color: #FF0000;
+      }
+    
+    p#desc {
+      text-align: center;
+      font-size: 0.9em;
+    }
+    
+    #example {
+      background-color: #E2E1E7;
+      padding: 7px;
+      border: 1px solid #B3A4E4;
+      width: 300px;
+      margin: 20px auto;
+    }
+
+      #example pre,
+      #example pre code {
+        margin: 0;
+        font-family: Monaco, 'Courier New', Courier, monospace;
+      }
+    
+    #download {
+      text-align: center;
+    }
+      #download a {
+        color: #4568B2;
+      }
+      #download a:hover {
+        color: #093BAC;
+      }
