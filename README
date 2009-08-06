@@ -104,6 +104,9 @@ How to use it
       All requests are logged to stdout and to berry.logfile, which by
       default is a temporary file with the prefix `berry-'.
       
+      Note: I feel that logging probably shouldn't be done by Berry itself.
+      In the future this may change.
+      
   Headers
   -------
   
