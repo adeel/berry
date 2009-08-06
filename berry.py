@@ -19,6 +19,10 @@ import sys
 import re
 import cgi
 import traceback
+import tempfile
+import logging
+import logging.handlers
+import paste.httpserver
 
 debug = False
 
@@ -26,8 +30,36 @@ routes = []
 middlewares = []
 error_handlers = {}
 
-def app():
-  return handle_request
+logfile = tempfile.mkstemp(prefix='berry-')[1]
+logger = logging.getLogger('berry')
+
+def start(host='127.0.0.1', port=4567):
+  "Start the application."
+
+  _setup_logger()
+  
+  try:
+    serve(host, port)
+  except KeyboardInterrupt:
+    sys.exit()
+
+def use(middleware, options=None):
+  "Use a middleware.  (Can take options.)"
+  
+  middlewares.append((middleware, options))
+
+def redirect(url):
+  "Wrapper for redirecting."
+  
+  raise Redirect(url)
+
+def serve(host, port):
+  "Run the application using the HTTP server in Paste."
+  
+  app = handle_request
+  for middleware, options in middlewares:
+    app = middleware(app, options)
+  paste.httpserver.serve(app, host=host, port=str(port))
 
 def handle_request(env, start_response):
   "The WSGI application."
@@ -40,7 +72,6 @@ class Response(object):
   
   def __init__(self, request):
     self.request = request
-    self.status = None
   
   def get(self):
     route, urlparams = self.request._dispatch()
@@ -61,7 +92,7 @@ class Response(object):
         status = exception.status
         handler = exception.get_handler()
     
-    self.status = status
+    log(status, self.request)
     
     headers = getattr(handler, 'headers', {})
     if 'Content-Type' not in headers:
@@ -235,3 +266,27 @@ class Route(object):
     self.handler = handler
     self.method = method.upper()
   
+
+def log(status, request):
+  message = '%s: %s' % (status, request.fullpath)
+  
+  if status[0] == 200:
+    logger.info(message)
+  elif status[0] == 500:
+    logger.exception(message)
+  else:
+    logger.error(message)
+
+def _setup_logger():
+  
+  logger.setLevel(logging.DEBUG)
+  formatter = logging.Formatter('  [%(asctime)s] %(message)s')
+  stdout_handler = logging.StreamHandler()
+  stdout_handler.setFormatter(formatter)
+  logger.addHandler(stdout_handler)
+  
+  if logfile:
+    fhandler = logging.handlers.RotatingFileHandler(logfile, maxBytes=2**20,
+      backupCount=5, encoding='utf-8')
+    fhandler.setFormatter(formatter)
+    logger.addHandler(fhandler)
