@@ -22,7 +22,6 @@ import traceback
 import tempfile
 import logging
 import logging.handlers
-import paste.httpserver
 
 debug = False
 
@@ -33,33 +32,10 @@ error_handlers = {}
 logfile = tempfile.mkstemp(prefix='berry-')[1]
 logger = logging.getLogger('berry')
 
-def start(host='127.0.0.1', port=4567):
-  "Start the application."
-
+def app():
   _setup_logger()
   
-  try:
-    serve(host, port)
-  except KeyboardInterrupt:
-    sys.exit()
-
-def use(middleware, options=None):
-  "Use a middleware.  (Can take options.)"
-  
-  middlewares.append((middleware, options))
-
-def redirect(url):
-  "Wrapper for redirecting."
-  
-  raise Redirect(url)
-
-def serve(host, port):
-  "Run the application using the HTTP server in Paste."
-  
-  app = handle_request
-  for middleware, options in middlewares:
-    app = middleware(app, options)
-  paste.httpserver.serve(app, host=host, port=str(port))
+  return handle_request
 
 def handle_request(env, start_response):
   "The WSGI application."
@@ -72,6 +48,7 @@ class Response(object):
   
   def __init__(self, request):
     self.request = request
+    self.status = None
   
   def get(self):
     route, urlparams = self.request._dispatch()
@@ -92,7 +69,8 @@ class Response(object):
         status = exception.status
         handler = exception.get_handler()
     
-    log(status, self.request)
+    self.status = status
+    log(self.status, self.request)
     
     headers = getattr(handler, 'headers', {})
     if 'Content-Type' not in headers:
@@ -278,7 +256,6 @@ def log(status, request):
     logger.error(message)
 
 def _setup_logger():
-  
   logger.setLevel(logging.DEBUG)
   formatter = logging.Formatter('  [%(asctime)s] %(message)s')
   stdout_handler = logging.StreamHandler()
