@@ -124,9 +124,6 @@ How to use it
 
 How to install
 --------------
-
-  For now, Berry uses the HTTP server in Paste, so you need to have that
-  installed.
   
   If you have setuptools just do:
   
