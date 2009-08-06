@@ -6,14 +6,13 @@ desc = open('README').read()
 
 setup(
   name='berry',
-  version='0.5',
+  version='0.1',
   description="a minimalist web framework",
   long_description=desc,
   url='http://soundofemptiness.com/projects/berry',
   author='Adeel Ahmad Khan',
   author_email='adeel2@umbc.edu',
   py_modules=['berry'],
-  install_requires=['Paste'],
   classifiers=[
     'Development Status :: 4 - Beta',
     'License :: OSI Approved :: MIT License',
