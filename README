@@ -123,9 +123,6 @@ How to use it
     The WSGI environ variable is available as the env attribute of the Request
     object.
   
-  
-  You can use something like Jinja, etc., for views and Beaker for sessions.
-  Use nginx to serve static files.
 
 How to install
 --------------
