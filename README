@@ -118,8 +118,6 @@ How to use it
   Using WSGI middleware
   ---------------------
 
-    To use a WSGI middleware, use berry.use:
-
       berry.use(MyMiddleware, options_dict)
 
     The WSGI environ variable is available as the env attribute of the Request
