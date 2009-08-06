@@ -1,25 +1,31 @@
 Berry is a minimal abstraction of WSGI which can be used to build a standard
 web framework stack that includes an ORM, views and so on.
 
+Basically, you map some routes to functions.  Berry takes this mapping and
+generates a WSGI app, which you can serve however you like.
+
 Example
 -------
 
-  import berry
-  from wsgiref.simple_server import make_server
+  Here is an example using the wsgiref server, included in Python's stdlib
+  and ideal for development use.
+
+    import berry
+    from wsgiref.simple_server import make_server
   
-  @berry.get('^$')
-  def index(req):
-    return "Welcome to the home page."
+    @berry.get('^$')
+    def index(req):
+      return "Welcome to the home page."
   
-  @berry.get('^hello/(.+)/?$')
-  def hello(req, name):
-    return "Hello, %s!" % name
+    @berry.get('^hello/(.+)/?$')
+    def hello(req, name):
+      return "Hello, %s!" % name
   
-  # generate a WSGI app
-  wsgi_app = berry.app()
+    # generate a WSGI app
+    wsgi_app = berry.app()
   
-  # start a WSGI server
-  make_server('127.0.0.1', 8000, wsgi_app).serve_forever()
+    # start a WSGI server
+    make_server('127.0.0.1', 8000, wsgi_app).serve_forever()
 
 How to use it
 -------------
@@ -106,7 +112,7 @@ How to use it
       default is a temporary file with the prefix `berry-'.
       
       Note: I feel that logging probably shouldn't be done by Berry itself.
-      In the future this may change.
+      In the future this may change.  (Some WSGI servers do it.)
       
   Headers
   -------
@@ -118,14 +124,6 @@ How to use it
         # ...
       
     By default the Content-Type is set to 'text/html'.
-    
-  Using WSGI middleware
-  ---------------------
-
-      berry.use(MyMiddleware, options_dict)
-
-    The WSGI environ variable is available as the env attribute of the Request
-    object.
   
 
 How to install
@@ -152,4 +150,3 @@ How to install
   
   If you try Berry, please write me at <adeel2@umbc.edu> and let me know what
   you think.
-
