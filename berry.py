@@ -1,19 +1,4 @@
-"""
-Berry is a minimal web framework written in Python.
-
-import berry
-from berry import get
-
-@get('^$')
-def index(req):
-  return "<h1>Welcome to the home page.</h1>"
-
-@get('^hello/(.+)/?$')
-def hello(req, name):
-  return "<h1>Hello, %s!</h1>" % name
-
-berry.start()
-"""
+"Berry is a minimal abstraction of WSGI."
 
 import sys
 import re
