@@ -1,5 +1,9 @@
 Berry is a minimal web framework written in Python.
 
+The eventual goal for Berry is a minimal abstraction of WSGI which can be used
+as part of a standard web framework stack that includes an ORM, views and so
+on.
+
 Example
 -------
 
