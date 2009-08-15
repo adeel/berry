@@ -1,5 +1,4 @@
-Berry is a minimal abstraction of WSGI which can be used to build a standard
-web framework stack that includes an ORM, views and so on.
+Berry is a minimal DSL for building a WSGI application.
 
 Basically, you map some routes to functions.  Berry takes this mapping and
 generates a WSGI app, which you can serve however you like.

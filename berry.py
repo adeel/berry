@@ -1,4 +1,4 @@
-"Berry is a minimal abstraction of WSGI."
+"Berry is a minimal DSL for building a WSGI application."
 
 import sys
 import re
