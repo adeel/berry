@@ -4,9 +4,6 @@ import sys
 import re
 import cgi
 import traceback
-import tempfile
-import logging
-import logging.handlers
 
 debug = False
 
@@ -14,15 +11,7 @@ routes = []
 middlewares = []
 error_handlers = {}
 
-logfile = tempfile.mkstemp(prefix='berry-')[1]
-logger = logging.getLogger('berry')
-
-def app():
-  _setup_logger()
-  
-  return handle_request
-
-def handle_request(env, start_response):
+def app(env, start_response):
   "The WSGI application."
   
   request = Request(env, start_response)  
@@ -55,7 +44,6 @@ class Response(object):
         handler = exception.get_handler()
     
     self.status = status
-    log(self.status, self.request)
     
     headers = getattr(handler, 'headers', {})
     if 'Content-Type' not in headers:
@@ -167,7 +155,8 @@ class Request(object):
   def _parse_post_params(self):
     "Parse form data passed through POST."
     
-    parsed = cgi.FieldStorage(fp=self.env['wsgi.input'], environ=self.env,
+    parsed = cgi.FieldStorage(fp=self.env['wsgi.input'],
+                              environ=self.env,
                               keep_blank_values=True)
     params = {}
     for key in parsed:
@@ -229,26 +218,3 @@ class Route(object):
     self.handler = handler
     self.method = method.upper()
   
-
-def log(status, request):
-  message = '%s: %s' % (status, request.fullpath)
-  
-  if status[0] == 200:
-    logger.info(message)
-  elif status[0] == 500:
-    logger.exception(message)
-  else:
-    logger.error(message)
-
-def _setup_logger():
-  logger.setLevel(logging.DEBUG)
-  formatter = logging.Formatter('  [%(asctime)s] %(message)s')
-  stdout_handler = logging.StreamHandler()
-  stdout_handler.setFormatter(formatter)
-  logger.addHandler(stdout_handler)
-  
-  if logfile:
-    fhandler = logging.handlers.RotatingFileHandler(logfile, maxBytes=2**20,
-      backupCount=5, encoding='utf-8')
-    fhandler.setFormatter(formatter)
-    logger.addHandler(fhandler)
