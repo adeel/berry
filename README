@@ -59,8 +59,8 @@ How to use it
     
       @berry.post('^login$')
       def login(req):
-        username = berry.params['username']
-        password = berry.params['password']
+        username = berry.params.get('username')
+        password = berry.params.get('password')
         # ...
     
   Handling errors
