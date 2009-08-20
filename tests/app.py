@@ -10,16 +10,8 @@ def hello(req, name):
   return "Hello, %s!" % name
 
 @berry.get('^hello/?$')
-def hello_form_get(req):
-  return """
-    <form action="/hello" method="post">
-      <input type="text" name="name" value="Name" />
-      <input type="submit" />
-    </form>
-  """.strip()
-
 @berry.post('^hello/?$')
-def hello_form_post(req):
+def hello_form(req):
   if req.params.get('name'):
     return hello(req, req.params.get('name'))
   else:
