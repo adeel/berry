@@ -1,6 +1,6 @@
 from cherrypy.test.webtest import *
 
-tests = ('routing', 'headers', 'forms')
+tests = ('routing', 'headers', 'errors', 'forms')
 
 if __name__ == '__main__':
   for test in tests:

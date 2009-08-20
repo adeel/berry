@@ -31,4 +31,24 @@ def txt_file(req):
 def redirect(req):
   raise berry.Redirect('http://google.com')
 
+@berry.get('^errors/404$')
+def not_found(req):
+  raise berry.NotFound()
+
+@berry.get('^errors/403$')
+def forbidden(req):
+  raise berry.Forbidden()
+
+@berry.get('^errors/500$')
+def app_error(req):
+  return 1/0
+
+class CustomError(berry.HTTPError):
+  status = (900, 'Custom')
+  content = "<h1>Custom Error</h1>"
+
+@berry.get('^errors/900$')
+def custom_error(req):
+  raise CustomError()
+
 make_server('localhost', 3000, berry.app).serve_forever()
