@@ -6,8 +6,10 @@ def index(req):
   return "index"
 
 @berry.get('^hello/(.+)/?$')
+@berry.post('^hello/(.+)/?$')
 def hello(req, name):
   return "Hello, %s!" % name
+
 
 @berry.get('^hello/?$')
 @berry.post('^hello/?$')
