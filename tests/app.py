@@ -27,4 +27,8 @@ def hello_form(req):
 def txt_file(req):
   return "a text file"
 
+@berry.get('^google/?$')
+def redirect(req):
+  raise berry.Redirect('http://google.com')
+
 make_server('localhost', 3000, berry.app).serve_forever()
