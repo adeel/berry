@@ -5,11 +5,14 @@ from wsgiref.simple_server import make_server
 def index(req):
   return "index"
 
+@berry.post('^post/?$')
+def post(req):
+  return "post"
+
 @berry.get('^hello/(.+)/?$')
 @berry.post('^hello/(.+)/?$')
 def hello(req, name):
   return "Hello, %s!" % name
-
 
 @berry.get('^hello/?$')
 @berry.post('^hello/?$')

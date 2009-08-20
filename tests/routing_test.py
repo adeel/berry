@@ -11,6 +11,10 @@ class RoutingTest(BerryTest):
     self.assertBody("Hello, world!")
   
   def test_route_post(self):
+    self.getPage('/post', method='POST')
+    self.assertBody("post")
+  
+  def test_route_post_with_url_params(self):
     self.getPage('/hello/world', method='POST')
     self.assertBody("Hello, world!")
   
