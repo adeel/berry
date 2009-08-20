@@ -1,12 +1,12 @@
 from test import *
 
-class RequestTest(BerryTest):
+class RoutingTest(BerryTest):
   
-  def test_get(self):
+  def test_route_get(self):
     self.getPage('/')
     self.assertBody("index")
   
-  def test_get_with_url_params(self):
+  def test_route_get_with_url_params(self):
     self.getPage('/hello/world')
     self.assertBody("Hello, world!")
   
