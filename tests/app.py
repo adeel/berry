@@ -22,4 +22,9 @@ def hello_form(req):
   else:
     raise berry.Redirect('/hello')
 
+@berry.header('Content-Type', 'text/plain')
+@berry.get('^static/test\.txt$')
+def txt_file(req):
+  return "a text file"
+
 make_server('localhost', 3000, berry.app).serve_forever()
