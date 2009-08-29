@@ -125,7 +125,7 @@ class Request(object):
     
     for route in routes:
       if route.method == self.method:
-        match = re.search(route.path, self.path)
+        match = re.search(route.path, self.path, re.I)
         if match is not None:
           return route, list(match.groups())
     return None, []

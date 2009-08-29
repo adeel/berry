@@ -18,3 +18,7 @@ class RoutingTest(BerryTest):
     self.getPage('/hello/world', method='POST')
     self.assertBody("Hello, world!")
   
+  def test_routes_are_case_insensitive(self):
+    self.getPage('/HELLO/world')
+    self.assertStatus(200)
+  
