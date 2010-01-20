@@ -163,8 +163,8 @@ class Request(object):
       val = parsed[key]
       if hasattr(val, 'filename') and val.filename:
         params[key] = val
-      elif any((isinstance(val, cgi.FieldStorage),
-                isinstance(val, cgi.MiniFieldStorage))):
+      elif (isinstance(val, cgi.FieldStorage) or
+                isinstance(val, cgi.MiniFieldStorage)):
         params[key] = val.value
       else:
         params[key] = [f.value for f in val]
