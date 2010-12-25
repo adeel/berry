@@ -59,10 +59,20 @@ How to use it
     
       @berry.post('^login$')
       def login(req):
-        username = berry.params.get('username')
-        password = berry.params.get('password')
+        username = req.params.get('username')
+        password = req.params.get('password')
         # ...
-    
+
+    Note: if you have a field like 'a[b]' with value 'c', Berry will parse it
+    into a dictionary.  For example:
+
+      <input name="person[name]" value="James" />
+      <input name="person[age]" value="20" />
+
+    will result in req.params being:
+
+      {'person': {'name': 'James', 'age': '20'}}.
+
   Handling errors
   ---------------
   

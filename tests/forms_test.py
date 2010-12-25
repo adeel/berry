@@ -16,3 +16,8 @@ class FormsTest(BerryTest):
     self.getPage('/hello', method='POST')
     self.assertStatus(303)
   
+  def test_dict_params(self):
+    name = 'james'
+    age = '20'
+    self.getPage('/dict?someone[name]=%s&someone[age]=%s' % (name, age))
+    self.assertBody("Hello %s!  You are %s years old." % (name, age))

@@ -22,6 +22,12 @@ def hello_form(req):
   else:
     raise berry.Redirect('/hello')
 
+@berry.get('^dict/?$')
+def dict_form(req):
+  return "Hello %s!  You are %s years old." % (
+    req.params.get('someone')['name'],
+    req.params.get('someone')['age'])
+
 @berry.header('Content-Type', 'text/plain')
 @berry.get('^static/test\.txt$')
 def txt_file(req):

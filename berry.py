@@ -136,7 +136,20 @@ class Request(object):
     params = {}
     params.update(self._parse_get_params())
     params.update(self._parse_post_params())
-    return params
+
+    # parses fields like a[b] into dictionaries
+    params_ = {}
+    for key, value in params.iteritems():
+      m = re.compile('^([^\[\]]+)\[([^\[\]]+)\]$').match(key)
+      if m:
+        k, v = m.groups()
+        if not params_.get(k):
+          params_[k] = {}
+        params_[k][v] = value
+      else:
+        params_[key] = value
+
+    return params_
   
   def _parse_get_params(self):
     "Parse form data passed through GET."
