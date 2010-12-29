@@ -3,6 +3,7 @@
 import sys
 import re
 import cgi
+import urlparse
 import traceback
 
 debug = False
@@ -10,6 +11,8 @@ debug = False
 routes = []
 middlewares = []
 error_handlers = {}
+
+parse_qs = urlparse.parse_qs or cgi.parse_qs
 
 def app(env, start_response):
   "The WSGI application."
