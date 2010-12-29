@@ -72,6 +72,15 @@ How to use it
     will result in req.params being:
 
       {'person': {'name': 'James', 'age': '20'}}.
+    
+    Also,
+    
+      <input name="person[friends][]" value="James" />
+      <input name="person[friends][]" value="John" />
+
+    will result in req.params being:
+
+      {'person': {'friend': ['James', 'John']}}.
 
   Handling errors
   ---------------

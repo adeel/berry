@@ -143,14 +143,18 @@ class Request(object):
     # parses fields like a[b] into dictionaries
     params_ = {}
     for key, value in params.iteritems():
-      dict = _parse_param_as_dict(key, value)
-      if dict:
-        for k, v in dict.iteritems():
+      d = _parse_param_as_dict(key, value)
+      for k, v in d.iteritems():
+        if isinstance(v, dict):
           if not params_.get(k):
             params_[k] = {}
           params_[k] = _recursive_dict_update(params_[k], v)
-      else:
-        params_[key] = value
+        elif isinstance(v, list):
+          if not params_.get(k):
+            params_[k] = []
+          params_[k].extend(v)
+        else:
+          params_[k] = v
 
     return params_
   
@@ -235,16 +239,28 @@ class Route(object):
     self.method = method.upper()
 
 def _parse_param_as_dict(key, value):
-  match = re.compile('^(.+)\[([^\[\]]+)\]$').match(key)
+  match = re.compile('^(.+)\[([^\[\]]*)\]$').match(key)
   if not match:
     return {key: value}
 
   k, v = match.groups()
+  if v == '':
+    if isinstance(value, list):
+      return _parse_param_as_dict(k, value)
+    return _parse_param_as_dict(k, value)
+  
   return _parse_param_as_dict(k, {v: value})
 
 def _recursive_dict_update(x, y):
   for key, val in y.iteritems():
-    if not x.has_key(key):
-      x[key] = {}
-    x[key].update(val)
+    if isinstance(val, dict):
+      if not x.has_key(key):
+        x[key] = {}
+      x[key] = _recursive_dict_update(x[key], val)
+    elif isinstance(val, list):
+      if not x.has_key(key):
+        x[key] = []
+      x[key].extend(val)
+    else:
+      x[key] = val
   return x
