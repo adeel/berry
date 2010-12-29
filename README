@@ -80,7 +80,7 @@ How to use it
 
     will result in req.params being:
 
-      {'person': {'friend': ['James', 'John']}}.
+      {'person': {'friends': ['James', 'John']}}.
 
   Handling errors
   ---------------
