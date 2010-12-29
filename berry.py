@@ -157,7 +157,7 @@ class Request(object):
   def _parse_get_params(self):
     "Parse form data passed through GET."
     
-    parsed = cgi.parse_qs(self.env['QUERY_STRING'], keep_blank_values=True)
+    parsed = parse_qs(self.env['QUERY_STRING'], keep_blank_values=True)
     params = {}
     for key, val in parsed.items():
       if len(val) == 0:
