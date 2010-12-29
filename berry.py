@@ -143,12 +143,12 @@ class Request(object):
     # parses fields like a[b] into dictionaries
     params_ = {}
     for key, value in params.iteritems():
-      m = re.compile('^([^\[\]]+)\[([^\[\]]+)\]$').match(key)
-      if m:
-        k, v = m.groups()
-        if not params_.get(k):
-          params_[k] = {}
-        params_[k][v] = value
+      dict = _parse_param_as_dict(key, value)
+      if dict:
+        for k, v in dict.iteritems():
+          if not params_.get(k):
+            params_[k] = {}
+          params_[k] = _recursive_dict_update(params_[k], v)
       else:
         params_[key] = value
 
@@ -233,4 +233,18 @@ class Route(object):
     self.path = path
     self.handler = handler
     self.method = method.upper()
-  
+
+def _parse_param_as_dict(key, value):
+  match = re.compile('^(.+)\[([^\[\]]+)\]$').match(key)
+  if not match:
+    return {key: value}
+
+  k, v = match.groups()
+  return _parse_param_as_dict(k, {v: value})
+
+def _recursive_dict_update(x, y):
+  for key, val in y.iteritems():
+    if not x.has_key(key):
+      x[key] = {}
+    x[key].update(val)
+  return x
