@@ -247,8 +247,8 @@ def _parse_param_as_dict(key, value):
   if v == '':
     if isinstance(value, list):
       return _parse_param_as_dict(k, value)
-    return _parse_param_as_dict(k, value)
-  
+    return _parse_param_as_dict(k, [value])
+
   return _parse_param_as_dict(k, {v: value})
 
 def _recursive_dict_update(x, y):
