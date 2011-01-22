@@ -4,7 +4,7 @@ desc = open('README').read()
 
 setup(
   name='berry',
-  version='0.3',
+  version='0.3.1',
   description="a minimal DSL for building a WSGI app",
   long_description=desc,
   url='http://soundofemptiness.com/projects/berry',
