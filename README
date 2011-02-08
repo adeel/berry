@@ -1,0 +1,165 @@
+Berry is a minimal DSL for building a WSGI application.
+
+Basically, you map some routes to functions.  Berry takes this mapping and
+generates a WSGI app, which you can serve however you like.
+
+Example
+-------
+
+  Here is an example using the wsgiref server, included in Python's stdlib
+  and ideal for development use.
+
+    import berry
+    from wsgiref.simple_server import make_server
+  
+    @berry.get('^$')
+    def index(req):
+      return "Welcome to the home page."
+  
+    @berry.get('^hello/(.+)/?$')
+    def hello(req, name):
+      return "Hello, %s!" % name
+  
+    # generate a WSGI app
+    wsgi_app = berry.app
+  
+    # start a WSGI server
+    make_server('127.0.0.1', 8000, wsgi_app).serve_forever()
+
+How to use it
+-------------
+
+  Decorate a function with berry.get(route) or berry.post(route) to serve
+  GET/POST requests that match a route.  Routes must be regular expressions.
+  Your function will be passed a Request object as the first argument.
+  
+  Example:
+  
+    @berry.get('^$')
+    @berry.get('^home$')
+    def home(req):
+      return 'This is the home page.'
+    
+  As above, you can map multiple routes to the same function.
+  
+  Request objects
+  ---------------
+    
+    Useful attributes of Request objects are:
+    
+      - env: the WSGI environ variable.
+      - params: parameters passed through both GET and POST.
+      - path: the path requested, minus the initial '/' and the query string
+      - query: the query string, if any
+      - fullpath: the full path requested, including the initial '/' and the
+        query string
+      - method: the method (GET or POST)
+    
+    Example:
+    
+      @berry.post('^login$')
+      def login(req):
+        username = req.params.get('username')
+        password = req.params.get('password')
+        # ...
+
+    Note: if you have a field like 'a[b]' with value 'c', Berry will parse it
+    into a dictionary.  For example:
+
+      <input name="person[name]" value="James" />
+      <input name="person[age]" value="20" />
+
+    will result in req.params being:
+
+      {'person': {'name': 'James', 'age': '20'}}.
+    
+    Also,
+    
+      <input name="person[friends][]" value="James" />
+      <input name="person[friends][]" value="John" />
+
+    will result in req.params being:
+
+      {'person': {'friends': ['James', 'John']}}.
+
+  Handling errors
+  ---------------
+  
+    Using the berry.error(code) decorator, you can make custom error pages.
+    
+    Example:
+    
+      @berry.error(404)
+      def notfound(req):
+        return "%s was not found." % req.fullpath
+      
+    Berry has Redirect, Forbidden, NotFound, and AppError classes, which
+    are exceptions that inherit berry.HTTPError.  Just raise one of them:
+    
+      if not user.is_logged_in():
+        raise berry.Forbidden()
+    
+    To add an exception for a new HTTP status code you can do something like:
+    
+      class Unauthorized(berry.HTTPError):
+        status = (401, 'Unauthorized')
+        content = "<h1>401 Unauthorized</h1>"
+      
+    Application errors
+    ------------------
+    
+      If you set berry.debug = True, tracebacks will be outputted when there
+      is an exception in your code.  Otherwise they will only be written to
+      stderr.
+    
+    Redirecting
+    -----------
+    
+      To redirect, raise the berry.Redirect exception:
+      
+        raise berry.Redirect(url)
+    
+        
+  Headers
+  -------
+  
+    To add HTTP headers, use the berry.header decorator:
+    
+      @berry.header('Content-Type', 'text/plain')
+      def download_as_txt(req, id):
+        # ...
+      
+    By default the Content-Type is set to 'text/html'.
+  
+
+How to install
+--------------
+  
+  If you have setuptools just do:
+  
+    easy_install berry
+  
+  Otherwise, you can get the latest release from:
+  
+    http://pypi.python.org/pypi/berry
+  
+  Or get the latest development snapshot with git:
+  
+    git clone git://github.com/adeel/berry.git
+  
+  Then:
+  
+    python setup.py install
+  
+  If you try Berry, please write me at adeel2@umbc.edu and let me know what
+  you think.
+
+Latest changes
+--------------
+
+  - Not logging requests anymore (this should be done by a middleware).
+
+  - Berry simply generates a WSGI app for you to serve yourself, instead of
+    serving it for you.
+  
+  - The convenience function redirect() was removed.
