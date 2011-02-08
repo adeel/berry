@@ -60,11 +60,11 @@ INSTALLATION.
 
     # pip install berry
 
-  Method 3.  Download it from PyPI [12] and build:
+  Method 3.  Download it from PyPI [10] and build:
 
     # python setup.py install
 
-  [12]  http://pypi.python.org/pypi/berry
+  [10]  http://pypi.python.org/pypi/berry
 
 MANUAL.
 
@@ -96,7 +96,7 @@ MANUAL.
         The full path requested, including the initial '/' and the query
         string.
     - env:
-        The WSGI environ variable (a dict) [10].
+        The WSGI environ variable (a dict) [11].
 
     § 2.1  PARSING PARAMETERS.
 
@@ -129,9 +129,9 @@ MANUAL.
 
       (Obviously as stated this example is incorrect as dicts don't take
        multiple values for keys.  Technically, Request.params is a
-       cgi.FieldStorage instance [11], which is a dict-like object.)
+       cgi.FieldStorage instance [12], which is a dict-like object.)
 
-    § 2.2  THE ENVIRON VARIABLE.  Among other things [10], it is used by
+    § 2.2  THE ENVIRON VARIABLE.  Among other things [11], it is used by
     middleware to get data to your application (e.g. env['beaker.session']).
 
   § 3  ERROR HANDLING.  You can customize the error pages by using the
@@ -169,7 +169,7 @@ MANUAL.
 
     By default the Content-Type is 'text/html'.
 
-  [10]  WSGI environ <http://www.python.org/dev/peps/pep-0333/#environ-variables>
-  [11]  cgi.FieldStorage <http://docs.python.org/library/cgi.html#higher-level-interface>
+  [11]  WSGI environ <http://www.python.org/dev/peps/pep-0333/#environ-variables>
+  [12]  cgi.FieldStorage <http://docs.python.org/library/cgi.html#higher-level-interface>
 
 AUTHOR.  Adeel Ahmad Khan <adeel at adeel dot ru>.
