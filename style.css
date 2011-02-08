@@ -2,46 +2,40 @@ html,
 body {
   margin: 0;
   padding: 0;
-  background-color: #EAEAEA;
+  background-color: #fff;
 }
   #wrapper {
     width: 500px;
-    overflow: auto;
-    margin: 70px auto 20px;
+    margin: 0 auto;
     padding: 10px;
-    background-color: white;
-    border: 1px solid #BABABA;
-    font-family: Georgia, serif;
-    text-shadow: 0 0 0 white;
-    font-size: 1.4em;
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
   }
-  
+
     h1 {
-      font-size: 100px;
-      font-weight: normal;
-      margin: 10px;
+      font-size: 2.5em;
+      margin: 0 0 5px;
       text-align: center;
     }
       h1 a,
       h1 a:hover {
         text-decoration: none;
-        color: #B01C16;
+        color: black;
       }
       h1 a:hover {
-        color: #FF0000;
+        color: black;
       }
-    
+
     p#desc {
       text-align: center;
-      font-size: 0.9em;
+      margin: 0 0 20px;
+      font-size: 1.2em;
     }
-    
+
     #example {
       background-color: #E2E1E7;
-      padding: 7px;
-      border: 1px solid #B3A4E4;
-      width: 300px;
+      padding: 10px 20px;
       margin: 20px auto;
+      width: 300px;
     }
 
       #example pre,
@@ -49,13 +43,21 @@ body {
         margin: 0;
         font-family: Monaco, 'Courier New', Courier, monospace;
       }
-    
-    #download {
+
+    #footer {
       text-align: center;
     }
-      #download a {
+      #footer a {
         color: #4568B2;
+        padding-right: 10px
       }
-      #download a:hover {
+      #footer a:hover {
         color: #093BAC;
+      }
+      #footer a:last-child {
+        padding: 0;
+      }
+
+      #footer #author a {
+        color: #999;
       }
