@@ -1,5 +1,4 @@
 
-
                                      berry
                   a minimal DSL for building WSGI applications
 
@@ -157,7 +156,7 @@ MANUAL.
       in your application, the traceback will be written to stderr.  If you set
       berry.debug = True, the traceback will also be shown on the error page.
 
-      § 3.2.  REDIRECTS.  Raise the berry.Redirect exception:
+      § 3.2  REDIRECTS.  Raise the berry.Redirect exception:
 
         raise berry.Redirect(url)
 
