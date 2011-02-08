@@ -7,9 +7,9 @@ setup(
   version='0.3.1',
   description="a minimal DSL for building a WSGI app",
   long_description=desc,
-  url='http://soundofemptiness.com/projects/berry',
+  url='http://adeel.github.com/berry',
   author='Adeel Ahmad Khan',
-  author_email='adeel2@umbc.edu',
+  author_email='adeel@adeel.ru',
   py_modules=['berry'],
   classifiers=[
     'Development Status :: 5 - Production/Stable',
