@@ -5,7 +5,7 @@ body {
   background-color: #fff;
 }
   #wrapper {
-    width: 500px;
+    width: 350px;
     margin: 0 auto;
     padding: 10px;
     font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
@@ -26,9 +26,10 @@ body {
       }
 
     p#desc {
-      text-align: center;
-      margin: 0 0 20px;
+      text-align: justify;
+      margin: 0 auto 20px;
       font-size: 1.2em;
+      line-height: 1.3em;
     }
 
     #example {
