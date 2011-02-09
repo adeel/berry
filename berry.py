@@ -16,8 +16,8 @@ parse_qs = urlparse.parse_qs or cgi.parse_qs
 
 def app(env, start_response):
   "The WSGI application."
-  
-  request = Request(env, start_response)  
+
+  request = Request(env, start_response)
   response = Response(request)
   return response.get()
 
