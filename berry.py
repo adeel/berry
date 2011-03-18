@@ -11,6 +11,7 @@ debug = False
 routes = []
 middlewares = []
 error_handlers = {}
+before_request_hooks = []
 
 parse_qs = urlparse.parse_qs or cgi.parse_qs
 
@@ -37,7 +38,11 @@ class Response(object):
     else:
       status = (200, 'OK')
       handler = route.handler
-      
+
+      # Execute before_request hooks.
+      for hook in before_request_hooks:
+        hook(self.request)
+
       try:
         content = handler(self.request, *urlparams)
       except Exception, exception:
@@ -110,11 +115,14 @@ class AppError(HTTPError):
 
 class Request(object):
   "Abstraction of the WSGI request."
-  
+
+  # You can set custom properties here.
+  properties = {}
+
   def __init__(self, env, start_response):
     self.env = env
     self._start_response = start_response
-    
+
     self.path = self.env.get('PATH_INFO', '').lstrip('/')
     self.query = self.env.get('QUERY_STRING', '')
     self.fullpath = '/' + self.path
@@ -122,10 +130,16 @@ class Request(object):
       self.fullpath += '?' + self.query
     self.params = self._parse_params()
     self.method = self.env.get('REQUEST_METHOD', 'GET').upper()
-  
+
+  def __getattr__(self, name):
+    return self.properties.get(name)
+
+  def __setattr__(self, name, value):
+    self.properties[name] = value
+
   def _dispatch(self):
     "Dispatch the request."
-    
+
     for route in routes:
       if route.method == self.method:
         match = re.search(route.path, self.path, re.I)
@@ -237,6 +251,12 @@ class Route(object):
     self.path = path
     self.handler = handler
     self.method = method.upper()
+
+def before_request(hook):
+  "A decorator for adding hooks that execute before each request."
+
+  before_request_hooks.append(hook)
+  return hook
 
 def _parse_param_as_dict(key, value):
   match = re.compile('^(.+)\[([^\[\]]*)\]$').match(key)
